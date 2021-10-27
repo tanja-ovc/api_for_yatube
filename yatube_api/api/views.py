@@ -44,8 +44,8 @@ class CommentViewSet(IsAuthorOrReadOnlyPermission, viewsets.ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
-        serializer.save(post_id=self.kwargs['post_id'],
-                        author=self.request.user)
+        serializer.save(author=self.request.user,
+                        post_id=self.kwargs['post_id'])
 
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
