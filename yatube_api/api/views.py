@@ -12,20 +12,20 @@ from .serializers import CommentSerializer, FollowSerializer
 from .serializers import PostSerializer, GroupSerializer
 
 
-class PerformCreateUpdateDestroyMixin:
+class IsAuthorOrReadOnlyPermission:
     permission_classes = (IsAuthorOrReadOnly,)
+
+
+class PostViewSet(IsAuthorOrReadOnlyPermission, viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    pagination_class = LimitOffsetPagination
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
 
-class PostViewSet(PerformCreateUpdateDestroyMixin, viewsets.ModelViewSet):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
-    pagination_class = LimitOffsetPagination
-
-
-class CommentViewSet(PerformCreateUpdateDestroyMixin, viewsets.ModelViewSet):
+class CommentViewSet(IsAuthorOrReadOnlyPermission, viewsets.ModelViewSet):
     serializer_class = CommentSerializer
 
     def get_queryset(self):
@@ -42,6 +42,10 @@ class CommentViewSet(PerformCreateUpdateDestroyMixin, viewsets.ModelViewSet):
         if comment_id is not None:
             queryset = queryset.filter(comment__id=comment_id)
         return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(post_id=self.kwargs['post_id'],
+                        author=self.request.user)
 
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):

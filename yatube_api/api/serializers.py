@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from rest_framework.relations import SlugRelatedField
 from rest_framework.validators import UniqueTogetherValidator
 
 from posts.models import Comment, Follow, Group, Post
@@ -10,11 +9,12 @@ User = get_user_model()
 
 
 class PostSerializer(serializers.ModelSerializer):
-    author = SlugRelatedField(slug_field='username', read_only=True)
+    author = serializers.SlugRelatedField(
+        slug_field='username', read_only=True
+    )
 
     class Meta:
         fields = '__all__'
-        # ('id', 'text', 'pub_date', 'author', 'image', 'group')
         model = Post
 
 
@@ -28,6 +28,9 @@ class GroupSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         read_only=True, slug_field='username'
+    )
+    post = serializers.StringRelatedField(
+        read_only=True, default='0'
     )
 
     class Meta:
