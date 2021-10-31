@@ -1,32 +1,27 @@
-from rest_framework import filters
-from rest_framework import mixins
-from rest_framework import permissions
-from rest_framework import viewsets
-
+from posts.models import Comment, Group, Post
+from rest_framework import filters, permissions, viewsets
 from rest_framework.generics import get_object_or_404
 from rest_framework.pagination import LimitOffsetPagination
 
-from posts.models import Comment, Follow, Group, Post
-from .permissions import IsAuthorOrReadOnly
-from .serializers import CommentSerializer, FollowSerializer
-from .serializers import PostSerializer, GroupSerializer
+from .mixins import CreateOrGetListMixin
+from .permissions import IsAuthorOrReadOnlyPermission
+from .serializers import (CommentSerializer, FollowSerializer, GroupSerializer,
+                          PostSerializer)
 
 
-class IsAuthorOrReadOnlyPermission:
-    permission_classes = (IsAuthorOrReadOnly,)
-
-
-class PostViewSet(IsAuthorOrReadOnlyPermission, viewsets.ModelViewSet):
+class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     pagination_class = LimitOffsetPagination
+    permission_classes = (IsAuthorOrReadOnlyPermission,)
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
 
-class CommentViewSet(IsAuthorOrReadOnlyPermission, viewsets.ModelViewSet):
+class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
+    permission_classes = (IsAuthorOrReadOnlyPermission,)
 
     def get_queryset(self):
         """
@@ -54,12 +49,7 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (permissions.AllowAny,)
 
 
-class CreateOrGetListViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
-                             viewsets.GenericViewSet):
-    pass
-
-
-class FollowViewSet(CreateOrGetListViewSet):
+class FollowViewSet(CreateOrGetListMixin):
     serializer_class = FollowSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('following__username',)
@@ -68,7 +58,8 @@ class FollowViewSet(CreateOrGetListViewSet):
         """
         Returns a list of all subscriptions of the current user.
         """
-        queryset = Follow.objects.filter(user=self.request.user)
+        current_user = self.request.user
+        queryset = current_user.follower.all()
         return queryset
 
     def perform_create(self, serializer):
