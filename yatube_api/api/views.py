@@ -1,4 +1,3 @@
-from posts.models import Comment, Group, Post
 from rest_framework import filters, permissions, viewsets
 from rest_framework.generics import get_object_or_404
 from rest_framework.pagination import LimitOffsetPagination
@@ -7,6 +6,7 @@ from .mixins import CreateOrGetListMixin
 from .permissions import IsAuthorOrReadOnlyPermission
 from .serializers import (CommentSerializer, FollowSerializer, GroupSerializer,
                           PostSerializer)
+from posts.models import Comment, Group, Post
 
 
 class PostViewSet(viewsets.ModelViewSet):
