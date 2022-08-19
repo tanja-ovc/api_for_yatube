@@ -1,15 +1,16 @@
 # API для Yatube
-## Проект 9-го спринта (блок API)
 
-### Описание
-API для платформы Yatube. Version 1.
+### API для Django-проекта с HTML-шаблонами "Yatube"
+(_https://github.com/tanja-ovc/yatube_django_templates_)
+
+### Version 1
 
 ### Установка
 Клонировать репозиторий и перейти в него в командной строке:
 
-```git clone https://github.com/tanja-ovc/api_final_yatube.git```
+```git clone https://github.com/tanja-ovc/api_for_yatube.git```
 
-Убедиться, что находитесь в директории _api_final_yatube_.
+Убедиться, что находитесь в директории _api_for_yatube_.
 
 Cоздать и активировать виртуальное окружение:
 
